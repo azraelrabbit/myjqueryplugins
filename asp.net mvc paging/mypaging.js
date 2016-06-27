@@ -10,12 +10,21 @@
     url: 指向你渲染分页页面的partialview 
     showInfo: 是否显示分页信息, 显示内容例如:  共 150 条 / 15 页
     paramData: 分页查询的参数信息,pageSize和pageIndex 属性是必须的,其他查询用的属性,可自己随意增加或定义.
+    method: // http请求方法, GET 或POST,默认可不设置此参数,默认值为GET
+    firsttext: 第一页按钮自定义文本,默认值为 << == &lt;&lt;
+    pretext: 上一页按钮自定义文本,默认值为 < == &lt;
+    nexttext: 下一页按钮自定义文本,默认值为 > == &gt;
+    lasttext: 最后一页按钮自定义文本,默认值为 >> == &gt;&gt;
 
    $('#pageDiv').Paging({
             url: hostVTPath + "/Home/GetPagedList",
             showInfo:true,
             paramData:{pageSize:10,pageIndex:1,content:'asflasjflsdajfjsd'},
-            method:'GET' // http请求方法, GET 或POST,默认可不设置此参数,默认值为GET
+            method:'GET' , 
+            firsttext:'首页',
+            pretext:'上一页',
+            nexttext:'下一页',
+            lasttext:'尾页'
         });
  
 
@@ -91,8 +100,8 @@ $.fn.extend({
             var pageDivhtml = "<div class='p-pg' id='ppg'><ul class='pagination'>";
 
             //add first and pre button
-            pageDivhtml += "<li><a href='javascript:void(0);' class='p-first hover' id='pfirst'>&lt;&lt; </a></li>";
-            pageDivhtml += "<li><a href='javascript:void(0);' class='p-pre hover' id='ppre'>&lt; </a></li>";
+            pageDivhtml += "<li><a href='javascript:void(0);' class='p-first hover' id='pfirst'>" + options.firsttext + "</a></li>";
+            pageDivhtml += "<li><a href='javascript:void(0);' class='p-pre hover' id='ppre'>" + options.pretext + "</a></li>";
 
             //process number buttons.
             var current = pageindex;
@@ -133,8 +142,8 @@ $.fn.extend({
             }
 
             //add last and next button
-            pageDivhtml += "<li><a href='javascript:void(0);' class='p-next hover' id='pnext'>&gt; </a></li>";
-            pageDivhtml += "<li><a href='javascript:void(0);' class='p-last hover' id='plast'>&gt;&gt; </a></li>";
+            pageDivhtml += "<li><a href='javascript:void(0);' class='p-next hover' id='pnext'>" + options.nexttext+ "</a></li>";
+            pageDivhtml += "<li><a href='javascript:void(0);' class='p-last hover' id='plast'>" + options.lasttext + "</a></li>";
 
             //add info 
             if (options.showInfo) {
@@ -345,8 +354,7 @@ $.fn.extend({
         var ctid = $(pageingContainer).idOrName;
         window.zppaging = {};
         window.zppaging[ctid] = {};
-        window.zppaging[ctid].options = options;
-        window.zppaging[ctid].callback = showPageing;
+      
 
         if (options) {
             if (!options.pageSize) {
@@ -371,6 +379,19 @@ $.fn.extend({
                 options.method = "GET";
             }
 
+            //<  ==  &lt;    >== &gt;
+            if (!options.firsttext) {
+                options.firsttext = "&lt;&lt;";
+            }
+            if (!options.pretext) {
+                options.pretext = "&lt;";
+            }
+            if (!options.lasttext) {
+                options.lasttext = "&gt;&gt;";
+            }
+            if (!options.nexttext) {
+                options.nexttext = "&gt;";
+            }
 
         } else {
             options = {
@@ -380,6 +401,10 @@ $.fn.extend({
                 showInfo: false
             };
         }
+
+        window.zppaging[ctid].options = options;
+        window.zppaging[ctid].callback = showPageing;
+
 
         //render paging content
         showPageing(options.pageSize, options.pageIndex);
