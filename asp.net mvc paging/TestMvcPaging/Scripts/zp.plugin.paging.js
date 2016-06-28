@@ -10,6 +10,7 @@
     url: 指向你渲染分页页面的partialview 
     showInfo: 是否显示分页信息, 显示内容例如:  共 150 条 / 15 页
     paramData: 分页查询的参数信息,pageSize和pageIndex 属性是必须的,其他查询用的属性,可自己随意增加或定义.
+    shownumbers:true,  //是否显示分页数字按钮,默认为true,若为false,则只显示首页,前页,当前页码,下页,尾页按钮.
     method: // http请求方法, GET 或POST,默认可不设置此参数,默认值为GET
     firsttext: 第一页按钮自定义文本,默认值为 << == &lt;&lt;
     pretext: 上一页按钮自定义文本,默认值为 < == &lt;
@@ -24,6 +25,7 @@
             url: hostVTPath + "/Home/GetPagedList",
             showInfo:true,
             paramData:{content:'asflasjflsdajfjsd'},
+            shownumbers:true,
             pageSize:10,
             pageIndex:1,
             loadingtext:''  //默认值为 loading ...
@@ -147,40 +149,73 @@ $.fn.extend({
             var current = pageindex;
 
             //确定当前页之前,之后的页码,保证一共出现11个页码按钮
+            if (options.shownumbers) {
 
-            if (pagecount > 10) {
-                var startpg = 1;
+                if (pagecount > 10) {
+                    var startpg = 1;
 
-                if (current >= 6) {
-                    startpg = current - 5;
-                }
+                    if (current >= 6) {
+                        startpg = current - 5;
+                    }
 
-                if (current + 5 > pagecount) {
-                    startpg = pagecount - 10;
-                }
+                    if (current + 5 > pagecount) {
+                        startpg = pagecount - 10;
+                    }
 
-                var maxI = startpg + 11;
+                    var maxI = startpg + 11;
 
-                for (var i = startpg; i < maxI; i++) {
-                    //  slog(i);
-                    if (i === current) {
-                        pageDivhtml += "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" + numbtnWidth + "px;' id='p" + i + "'>" + i + "</a></li>";
-                    } else {
-                        pageDivhtml += "<li><a href='javascript:void(0);' class='p-numbers hover'  style='width:" + numbtnWidth + "px;'  id='p" + i + "'>" + i + "</a></li>";
+                    for (var i = startpg; i < maxI; i++) {
+                        //  slog(i);
+                        if (i === current) {
+                            pageDivhtml += "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" +
+                                numbtnWidth +
+                                "px;' id='p" +
+                                i +
+                                "'>" +
+                                i +
+                                "</a></li>";
+                        } else {
+                            pageDivhtml += "<li><a href='javascript:void(0);' class='p-numbers hover'  style='width:" +
+                                numbtnWidth +
+                                "px;'  id='p" +
+                                i +
+                                "'>" +
+                                i +
+                                "</a></li>";
+                        }
+                    }
+
+                } else {
+                    for (var j = 1; j <= pagecount; j++) {
+                        var pg1 = j;
+                        if (j === current) {
+                            pageDivhtml += "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" +
+                                numbtnWidth +
+                                "px;'  id='p" +
+                                current +
+                                "'>" +
+                                current +
+                                "</a></li>";
+                        } else {
+                            pageDivhtml += "<li><a href='javascript:void(0);' class='p-numbers hover'  style='width:" +
+                                numbtnWidth +
+                                "px;' id='p" +
+                                pg1 +
+                                "'>" +
+                                pg1 +
+                                "</a></li>";
+                        }
                     }
                 }
-
             } else {
-                for (var j = 1; j <= pagecount; j++) {
-                    var pg1 = j;
-                    if (j === current) {
-                        pageDivhtml += "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" + numbtnWidth + "px;'  id='p" + current + "'>" + current + "</a></li>";
-                    } else {
-                        pageDivhtml += "<li><a href='javascript:void(0);' class='p-numbers hover'  style='width:" + numbtnWidth + "px;' id='p" + pg1 + "'>" + pg1 + "</a></li>";
-                    }
-                }
+                pageDivhtml += "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" +
+                               numbtnWidth +
+                               "px;' id='p" +
+                               current +
+                               "'>" +
+                               current +
+                               "</a></li>";
             }
-
             //add last and next button
             pageDivhtml += "<li><a href='javascript:void(0);' class='p-next hover' id='pnext'>" + options.nexttext + "</a></li>";
             pageDivhtml += "<li><a href='javascript:void(0);' class='p-last hover' id='plast'>" + options.lasttext + "</a></li>";
@@ -202,7 +237,7 @@ $.fn.extend({
             var $next = $(container).find('.p-next'); //$('#pnext');
             var $last = $(container).find('.p-last'); //$('#plast');
 
-            var $numberbuttons = $(container).find('.p-numbers');//所有数字按钮
+           
 
             $(container).css("text-align", options.align);
             $(container).css("vertical-align", 'central');
@@ -221,19 +256,25 @@ $.fn.extend({
                 $pagination.css("margin", 0).css("height", 25);
             }
 
-            $numberbuttons.off('click').on('click', function (e) {
-                var $pbar = $(this).parents('.p-pg').parent();
-                //var $rtotal = $pbar.find("#totalRows");
-                //var $pCount = $pbar.find("#pageCount");
-                var $pSize = $pbar.find("#pageSize");
-                //var $cPage = $pbar.find("#currentPage");
+            if (options.shownumbers) {
+                var $numberbuttons = $(container).find('.p-numbers');//所有数字按钮
 
-                var tonumber = $(this).html();
-                var pSize = parseInt($pSize.val());
-                callback(pSize, tonumber);
-                $(this).blur();
+                $numberbuttons.off('click')
+                    .on('click',
+                        function(e) {
+                            var $pbar = $(this).parents('.p-pg').parent();
+                            //var $rtotal = $pbar.find("#totalRows");
+                            //var $pCount = $pbar.find("#pageCount");
+                            var $pSize = $pbar.find("#pageSize");
+                            //var $cPage = $pbar.find("#currentPage");
 
-            });
+                            var tonumber = $(this).html();
+                            var pSize = parseInt($pSize.val());
+                            callback(pSize, tonumber);
+                            $(this).blur();
+
+                        });
+            }
 
             //bind click event
             $number.off('click')
@@ -416,6 +457,11 @@ $.fn.extend({
                 slog('paging target url is null!');
                 return false;
             }
+
+            if (options.shownumbers == undefined) {
+                options.shownumbers = true;
+            }
+
             if (!options.meghod) {
                 options.method = "GET";
             }
