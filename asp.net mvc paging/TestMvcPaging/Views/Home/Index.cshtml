@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+ 
+
+<script type="text/javascript">
+ 
+
+    $(document).ready(function () {
+ 
+        $('#pageDiv').Paging({
+            url: hostVTPath + "/Home/GetPagedList",
+            showInfo: true,
+            pageSize: 10,
+            pageIndex: 1,
+            paramData: { content: 'asflasjflsdajfjsd' },
+            firsttext: '首页',
+            pretext: '上一页',
+            nexttext: '下一页',
+            lasttext: '尾页'
+        });
+
+
+        $('#btnLoad').click(function(e) {
+            //$('#pageDiv').Paging({
+            //    url: hostVTPath + "/Home/GetPagedList",
+            //    showInfo: true,
+            //    pageSize: 10,
+            //    pageIndex: 6,
+            //    paramData: { content: '234234234' },
+            //    firsttext: '首页',
+            //    pretext: '上一页',
+            //    nexttext: '下一页',
+            //    lasttext: '尾页'
+            //});
+
+            $('#pageDiv').block();
+        });
+    });
+
+</script>
+
+<div class="container" style="">
+    <button id="btnLoad">加载第6页</button>
+    <div id="pageDiv" style="margin-top: 20px;" class=" ">
+
+    </div>
+    <i class="fa fa-spinner fa-pulse fa-3x fa-fw" style="font-size: 90px"></i>
+    <span class="sr-only">Loading...</span>
+</div>
