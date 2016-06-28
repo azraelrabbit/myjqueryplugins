@@ -17,6 +17,9 @@
     lasttext: 最后一页按钮自定义文本,默认值为 >> == &gt;&gt;
     pageBarContainer: 自定义分页条容器Id,为空,则自动追加到分页容器,不为空则渲染到指定Id的容器中,例如: '#zpPager',
     loadingtext: 自定义加载遮罩提示文本..默认为  'loading ...'
+    showloading:true; //是否使用内置的loading 加载遮罩,默认 true.
+    loadedCallback:function(container){}, 页面加载完毕回调方法,参数为要渲染页面的容器的jquery对象
+    loadingCallback:function(container){},页面开始加载回调方法,参数为要渲染页面的容器的jquery对象
    $('#pageDiv').Paging({
             url: hostVTPath + "/Home/GetPagedList",
             showInfo:true,
@@ -29,9 +32,17 @@
             firsttext:'首页',
             pretext:'上一页',
             nexttext:'下一页',
-            lasttext:'尾页'
+            lasttext:'尾页',
+            showloading:true;
+            loadedCallback:function(container){},
+            loadingCallback:function(container){}
         });
  
+ // 例如:
+ function onloadfinish(container) {
+            var cid = $(container).attr('id');
+            console.log(cid + ", page load finished");
+        }
 
 3. 在渲染的partialview里,回调一下setTotalRows()方法,通知分页控制条总共的记录数.
       $(document).ready(function() {
@@ -49,9 +60,9 @@
 
 //给jquery对象增加扩展方法.在方法内部可以使用$(this)类访问当前调用方法的对象.
 $.fn.extend({
-    setTotalRow: function (totalrows, pageindex, pagesize) {
+    zpSetTotalRow: function (totalrows, pageindex, pagesize) {
 
-        var ctid = $(this).idOrName;
+        var ctid = $(this).attr('id');
 
         var callback = window.zppaging[ctid].callback;
 
@@ -376,11 +387,12 @@ $.fn.extend({
                     });
         }
     },
-    Paging: function (options) {
+    zpPaging: function (options) {
 
         //--处理参数
-        var pageingContainer = $(this);
-        var ctid = $(pageingContainer).idOrName;
+        var $pageingContainer = $(this);
+        var ctid = $pageingContainer.attr("id");
+
         window.zppaging = {};
         window.zppaging[ctid] = {};
 
@@ -425,6 +437,20 @@ $.fn.extend({
             if (!options.loadingtext) {
                 options.loadingtext = 'loading ...';
             }
+            if (options.showloading == undefined) {
+                options.showloading = true;
+            }
+
+            //loadedCallback:function(container){},
+            //loadingCallback:function(container){}
+
+            if (!options.loadedCallback) {
+                options.loadedCallback = function (container) { };
+            }
+
+            if (!options.loadingCallback) {
+                options.loadingCallback = function (container) { };
+            }
 
         } else {
             options = {
@@ -445,12 +471,25 @@ $.fn.extend({
         //========== inner function definenation
         //reqeust url and show data
         function showPageing(pagesize, pageindex) {
-            $.blockUI.defaults.overlayCSS.opacity = '.2';
-            $(pageingContainer)
-                .block({
-                    message: '<div style=""><i class="fa fa-spinner fa-pulse fa-3x fa-fw" ></i><span class="">' + options.loadingtext + '</span></div>', //sr-only
-                    css: {border:'2px'}
-                });
+
+            //begin loadpaging
+
+            //loadedCallback:function(container){},
+            //loadingCallback:function(container){}
+
+            options.loadingCallback($pageingContainer);
+
+            if (options.showloading) {
+                try { //trying to use jquery.blockUI.js to show loading overlay. if do not reference it.then no overlay effect.and because to catch the error,there will be no error reported.
+                    $.blockUI.defaults.overlayCSS.opacity = '.2';
+                    $pageingContainer
+                        .block({
+                            message: '<div style=""><i class="fa fa-spinner fa-pulse fa-3x fa-fw" ></i><span class="">' + options.loadingtext + '</span></div>', //sr-only
+                            css: { border: '2px' }
+                        });
+                }
+                catch (e) { }
+            }
 
             var url = options.url;
             var paramData = options.paramData;
@@ -464,13 +503,28 @@ $.fn.extend({
             }
 
             function onsuccess(r) {
-                $(pageingContainer).html(r);
-                $(pageingContainer).unblock();
+                $pageingContainer.html(r);
 
+                options.loadedCallback($pageingContainer);
+
+                if (options.showloading) {
+                    try {
+                        $pageingContainer.unblock();
+                    } catch (e) {
+                    }
+                }
             }
 
             function onerror(r) {
-                $(pageingContainer).unblock();
+
+                options.loadedCallback($pageingContainer);
+
+                if (options.showloading) {
+                    try {
+                        $pageingContainer.unblock();
+                    } catch (e) {
+                    }
+                }
             }
         }
 

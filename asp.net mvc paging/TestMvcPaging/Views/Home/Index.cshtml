@@ -8,19 +8,35 @@
  
 
     $(document).ready(function () {
- 
-        $('#pageDiv').Paging({
-            url: hostVTPath + "/Home/GetPagedList",
-            showInfo: true,
-            pageSize: 10,
-            pageIndex: 1,
-            paramData: { content: 'asflasjflsdajfjsd' },
-            firsttext: '首页',
-            pretext: '上一页',
-            nexttext: '下一页',
-            lasttext: '尾页'
-        });
 
+        $('#pageDiv')
+            .zpPaging({
+                url: hostVTPath + "/Home/GetPagedList",
+                showInfo: true,
+                pageSize: 10,
+                pageIndex: 1,
+                paramData: { content: 'asflasjflsdajfjsd' },
+                firsttext: '首页',
+                pretext: '上一页',
+                nexttext: '下一页',
+                lasttext: '尾页',
+                showloading: true,
+                loadingCallback: onloadingstart,
+                loadedCallback: onloadfinish
+    });
+
+        function onloadingstart(container) {
+
+            var cid = $(container).attr('id');
+            
+            console.log(cid+", page begin loading");
+
+        }
+
+        function onloadfinish(container) {
+            var cid = $(container).attr('id');
+            console.log(cid + ", page load finished");
+        }
 
         $('#btnLoad').click(function(e) {
             //$('#pageDiv').Paging({
@@ -46,6 +62,6 @@
     <div id="pageDiv" style="margin-top: 20px;" class=" ">
 
     </div>
-    <i class="fa fa-spinner fa-pulse fa-3x fa-fw" style="font-size: 90px"></i>
-    <span class="sr-only">Loading...</span>
+    @*<i class="fa fa-spinner fa-pulse fa-3x fa-fw" style="font-size: 90px"></i>
+    <span class="sr-only">Loading...</span>*@
 </div>
