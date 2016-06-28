@@ -71,13 +71,9 @@ $.fn.extend({
         var options = window.zppaging[ctid].options;
 
         var $container = $(this);
-
-        var customeRenderPagingBar = false;
-
+ 
         if (options.pageBarContainer) {
-            customeRenderPagingBar = true;
-
-
+      
             //兼容指定分页控件容器功能,将分页工具条渲染到指定的容器中
             var pbarContainer = options.pageBarContainer;
 
@@ -109,14 +105,9 @@ $.fn.extend({
         $pcount.val(pagecount);
 
         function renderpaging(container, options, pageindex, pagesize, totalrow) {
-
-
-
+             
             var numbtnWidth = 40;
-            //$pg = $('#' + pgid);// 另一种查找子元素的方式
-            //$tt = $pg.find('.p-next');
-
-
+          
             var pagecount = parseInt(totalrows / pagesize);
             var ooPgc = totalrows % pagesize;
             if (ooPgc > 0) {
@@ -236,21 +227,10 @@ $.fn.extend({
             var $number = $(container).find('.p-number'); //$('#pnumber');
             var $next = $(container).find('.p-next'); //$('#pnext');
             var $last = $(container).find('.p-last'); //$('#plast');
-
-           
-
+ 
             $(container).css("text-align", options.align);
             $(container).css("vertical-align", 'central');
-
-            //process info bar
-
-            //if (options.showInfo) {
-
-            //    var infohtml =
-            //        '<div style="display:inline;height:100%;margin-right: 40px;"><span class="p-info" style="margin-top:0px;"></span></div>';
-            //    $(container).prepend($(infohtml));
-            //}
-
+ 
             var $pagination = $(container).find('.pagination');
             if ($pagination.length > 0) {
                 $pagination.css("margin", 0).css("height", 25);
@@ -261,12 +241,9 @@ $.fn.extend({
 
                 $numberbuttons.off('click')
                     .on('click',
-                        function(e) {
+                        function (e) {
                             var $pbar = $(this).parents('.p-pg').parent();
-                            //var $rtotal = $pbar.find("#totalRows");
-                            //var $pCount = $pbar.find("#pageCount");
                             var $pSize = $pbar.find("#pageSize");
-                            //var $cPage = $pbar.find("#currentPage");
 
                             var tonumber = $(this).html();
                             var pSize = parseInt($pSize.val());
@@ -298,22 +275,15 @@ $.fn.extend({
 
             $first.off('click')
                 .on('click',
-                    function (e) { //off('click').
+                    function (e) {  
 
                         var $pbar = $(this).parents('.p-pg').parent();
-
-                        var $rtotal = $pbar.find("#totalRows");
-                        var $pCount = $pbar.find("#pageCount");
+  
                         var $pSize = $pbar.find("#pageSize");
                         var $cPage = $pbar.find("#currentPage");
-                        var $number = $pbar.find('.p-number'); //$('#pnumber');
                         var oparam = { pageNumber: 1, pageSize: 10 };
                         var cpage = parseInt($cPage.val());
                         var pSize = parseInt($pSize.val());
-                        var pCount = parseInt($pCount.val());
-                        if (cpage <= 1) {
-                            // return  ;
-                        }
 
                         oparam.pageNumber = 1;
                         oparam.pageSize = pSize;
@@ -323,21 +293,15 @@ $.fn.extend({
                         }
 
                         callback(pSize, oparam.pageNumber);
-
                         $(this).blur();
-                        // return  ;
                     });
             $last.off('click')
                 .on('click',
                     function (e) { //off('click').
                         var $pbar = $(this).parents('.p-pg').parent();
-
-                        var $rtotal = $pbar.find("#totalRows");
                         var $pCount = $pbar.find("#pageCount");
                         var $pSize = $pbar.find("#pageSize");
                         var $cPage = $pbar.find("#currentPage");
-                        var $number = $pbar.find('.p-number'); //$('#pnumber');
-
                         var cpage = parseInt($cPage.val());
                         var pSize = parseInt($pSize.val());
                         var pCount = parseInt($pCount.val());
@@ -348,33 +312,24 @@ $.fn.extend({
 
                         var oparam = { pageNumber: 1, pageSize: 10 };
                         if (pCount === 0 || cpage >= pCount) {
-                            // return  ;
+                            
                         } else {
                             cpage = pCount;
                             oparam.pageNumber = cpage;
                             oparam.pageSize = pSize;
-
                             callback(pSize, oparam.pageNumber);
                         }
                         $(this).blur();
-                        //  return  ;
                     });
 
             $pre.off('click')
                 .on('click',
-                    function (e) { //off('click').
-
+                    function (e) {  
                         var $pbar = $(this).parents('.p-pg').parent();
-
-                        var $rtotal = $pbar.find("#totalRows");
-                        var $pCount = $pbar.find("#pageCount");
                         var $pSize = $pbar.find("#pageSize");
                         var $cPage = $pbar.find("#currentPage");
-                        var $number = $pbar.find('.p-number'); //$('#pnumber');
-
                         var cpage = parseInt($cPage.val());
                         var pSize = parseInt($pSize.val());
-                        var pCount = parseInt($pCount.val());
 
                         if (cpage === 1) {
                             return;
@@ -385,24 +340,17 @@ $.fn.extend({
                             cpage--;
                             oparam.pageNumber = cpage;
                             oparam.pageSize = pSize;
-                            ;
                             callback(pSize, oparam.pageNumber);
                         }
                         $(this).blur();
-                        // return  ;
                     });
             $next.off('click')
                 .on('click',
-                    function (e) { //off('click').
-
+                    function (e) { 
                         var $pbar = $(this).parents('.p-pg').parent();
-
-                        var $rtotal = $pbar.find("#totalRows");
                         var $pCount = $pbar.find("#pageCount");
                         var $pSize = $pbar.find("#pageSize");
                         var $cPage = $pbar.find("#currentPage");
-                        var $number = $pbar.find('.p-number'); //$('#pnumber');
-
                         var cpage = parseInt($cPage.val());
                         var pSize = parseInt($pSize.val());
                         var pCount = parseInt($pCount.val());
@@ -412,31 +360,24 @@ $.fn.extend({
                         }
 
                         var oparam = { pageNumber: 1, pageSize: 10 };
-                        if (pCount <= 1) {
-                            // return  ;
-                        }
-
+                       
                         if (cpage < pCount) {
                             cpage++;
                             oparam.pageNumber = cpage;
                             oparam.pageSize = pSize;
-
                             callback(pSize, oparam.pageNumber);
                         }
                         $(this).blur();
-                        // return  ;
                     });
         }
     },
     zpPaging: function (options) {
-
         //--处理参数
         var $pageingContainer = $(this);
         var ctid = $pageingContainer.attr("id");
 
         window.zppaging = {};
         window.zppaging[ctid] = {};
-
 
         if (options) {
             if (!options.pageSize) {
@@ -451,22 +392,17 @@ $.fn.extend({
             if (!options.paramData) {
                 options.paramData = { pageSize: options.pageSize, pageIndex: options.pageIndex };
             }
-
             if (!options.url) {
                 option.url = '';
                 slog('paging target url is null!');
                 return false;
             }
-
             if (options.shownumbers == undefined) {
                 options.shownumbers = true;
             }
-
             if (!options.meghod) {
                 options.method = "GET";
             }
-
-            //<  ==  &lt;    >== &gt;
             if (!options.firsttext) {
                 options.firsttext = "&lt;&lt;";
             }
@@ -479,30 +415,22 @@ $.fn.extend({
             if (!options.nexttext) {
                 options.nexttext = "&gt;";
             }
-
             if (!options.loadingtext) {
                 options.loadingtext = 'loading ...';
             }
             if (options.showloading == undefined) {
                 options.showloading = true;
             }
-
-            //loadedCallback:function(container){},
-            //loadingCallback:function(container){}
-
             if (!options.loadedCallback) {
                 options.loadedCallback = function (container) { };
             }
-
             if (!options.loadingCallback) {
                 options.loadingCallback = function (container) { };
             }
-
         } else {
             options = {
                 pageSize: 10,
-                align: 'left', //'right'
-                //callback: function (oparam) { },
+                pageIndex: 1,
                 showInfo: false
             };
         }
@@ -510,19 +438,13 @@ $.fn.extend({
         window.zppaging[ctid].options = options;
         window.zppaging[ctid].callback = showPageing;
 
-
         //render paging content
         showPageing(options.pageSize, options.pageIndex);
 
         //========== inner function definenation
         //reqeust url and show data
         function showPageing(pagesize, pageindex) {
-
             //begin loadpaging
-
-            //loadedCallback:function(container){},
-            //loadingCallback:function(container){}
-
             options.loadingCallback($pageingContainer);
 
             if (options.showloading) {
@@ -550,9 +472,7 @@ $.fn.extend({
 
             function onsuccess(r) {
                 $pageingContainer.html(r);
-
                 options.loadedCallback($pageingContainer);
-
                 if (options.showloading) {
                     try {
                         $pageingContainer.unblock();
@@ -562,9 +482,7 @@ $.fn.extend({
             }
 
             function onerror(r) {
-
                 options.loadedCallback($pageingContainer);
-
                 if (options.showloading) {
                     try {
                         $pageingContainer.unblock();
@@ -573,7 +491,6 @@ $.fn.extend({
                 }
             }
         }
-
         return true;
     }
 });
