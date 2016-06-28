@@ -15,11 +15,16 @@
     pretext: 上一页按钮自定义文本,默认值为 < == &lt;
     nexttext: 下一页按钮自定义文本,默认值为 > == &gt;
     lasttext: 最后一页按钮自定义文本,默认值为 >> == &gt;&gt;
-
+    pageBarContainer: 自定义分页条容器Id,为空,则自动追加到分页容器,不为空则渲染到指定Id的容器中,例如: '#zpPager',
+    loadingtext: 自定义加载遮罩提示文本..默认为  'loading ...'
    $('#pageDiv').Paging({
             url: hostVTPath + "/Home/GetPagedList",
             showInfo:true,
-            paramData:{pageSize:10,pageIndex:1,content:'asflasjflsdajfjsd'},
+            paramData:{content:'asflasjflsdajfjsd'},
+            pageSize:10,
+            pageIndex:1,
+            loadingtext:''  //默认值为 loading ...
+            pageBarContainer:'',
             method:'GET' , 
             firsttext:'首页',
             pretext:'上一页',
@@ -46,12 +51,38 @@
 $.fn.extend({
     setTotalRow: function (totalrows, pageindex, pagesize) {
 
-        renderpaging($(this), pageindex, pagesize, totalrows);
+        var ctid = $(this).idOrName;
 
-        var $psize = $(this).find('#pageSize');
-        var $pcount = $(this).find('#pageCount');
-        var $trow = $(this).find('#totalRows');
-        var $currentPage = (this).find('#currentPage');
+        var callback = window.zppaging[ctid].callback;
+
+        var options = window.zppaging[ctid].options;
+
+        var $container = $(this);
+
+        var customeRenderPagingBar = false;
+
+        if (options.pageBarContainer) {
+            customeRenderPagingBar = true;
+
+
+            //兼容指定分页控件容器功能,将分页工具条渲染到指定的容器中
+            var pbarContainer = options.pageBarContainer;
+
+            if (pbarContainer[0] !== '#') {
+                pbarContainer = '#' + pbarContainer;
+            }
+
+            $container = $(pbarContainer);
+
+            $container.empty();
+        }
+
+        renderpaging($container, options, pageindex, pagesize, totalrows);
+
+        var $psize = $container.find('#pageSize');
+        var $pcount = $container.find('#pageCount');
+        var $trow = $container.find('#totalRows');
+        var $currentPage = $container.find('#currentPage');
 
         var cpage = $currentPage.val();
 
@@ -64,16 +95,14 @@ $.fn.extend({
         $trow.val(totalrows);
         $pcount.val(pagecount);
 
-        function renderpaging(container, pageindex, pagesize, totalrow) {
+        function renderpaging(container, options, pageindex, pagesize, totalrow) {
+
+
 
             var numbtnWidth = 40;
             //$pg = $('#' + pgid);// 另一种查找子元素的方式
             //$tt = $pg.find('.p-next');
-            var ctid = $(container).idOrName;
 
-            var callback = window.zppaging[ctid].callback;
-
-            var options = window.zppaging[ctid].options;
 
             var pagecount = parseInt(totalrows / pagesize);
             var ooPgc = totalrows % pagesize;
@@ -142,7 +171,7 @@ $.fn.extend({
             }
 
             //add last and next button
-            pageDivhtml += "<li><a href='javascript:void(0);' class='p-next hover' id='pnext'>" + options.nexttext+ "</a></li>";
+            pageDivhtml += "<li><a href='javascript:void(0);' class='p-next hover' id='pnext'>" + options.nexttext + "</a></li>";
             pageDivhtml += "<li><a href='javascript:void(0);' class='p-last hover' id='plast'>" + options.lasttext + "</a></li>";
 
             //add info 
@@ -354,7 +383,7 @@ $.fn.extend({
         var ctid = $(pageingContainer).idOrName;
         window.zppaging = {};
         window.zppaging[ctid] = {};
-      
+
 
         if (options) {
             if (!options.pageSize) {
@@ -393,6 +422,10 @@ $.fn.extend({
                 options.nexttext = "&gt;";
             }
 
+            if (!options.loadingtext) {
+                options.loadingtext = 'loading ...';
+            }
+
         } else {
             options = {
                 pageSize: 10,
@@ -412,21 +445,33 @@ $.fn.extend({
         //========== inner function definenation
         //reqeust url and show data
         function showPageing(pagesize, pageindex) {
+            $.blockUI.defaults.overlayCSS.opacity = '.2';
+            $(pageingContainer)
+                .block({
+                    message: '<div style=""><i class="fa fa-spinner fa-pulse fa-3x fa-fw" ></i><span class="">' + options.loadingtext + '</span></div>', //sr-only
+                    css: {border:'2px'}
+                });
+
             var url = options.url;
             var paramData = options.paramData;
             paramData.pageSize = pagesize;
             paramData.pageIndex = pageindex;
 
             if (options.method.toUpperCase() === "GET") {
-                jsonAjaxGet(url, paramData, onsuccess);
+                jsonAjaxGet(url, paramData, onsuccess, onerror);
             } else {
-                jsonAjaxPost(url, paramData, onsuccess);
+                jsonAjaxPost(url, paramData, onsuccess, onerror);
             }
 
             function onsuccess(r) {
-                pageingContainer.html(r);
+                $(pageingContainer).html(r);
+                $(pageingContainer).unblock();
+
             }
 
+            function onerror(r) {
+                $(pageingContainer).unblock();
+            }
         }
 
         return true;
