@@ -64,6 +64,10 @@
 $.fn.extend({
     zpSetTotalRow: function (totalrows, pageindex, pagesize) {
 
+        //if (totalrows < 1) {
+        //    return true;
+        //}
+
         var ctid = $(this).attr('id');
 
         var callback = window.zppaging[ctid].callback;
@@ -88,6 +92,9 @@ $.fn.extend({
 
         renderpaging($container, options, pageindex, pagesize, totalrows);
 
+        if (totalrows < 1) {
+            return true;
+        }
         var $psize = $container.find('#pageSize');
         var $pcount = $container.find('#pageCount');
         var $trow = $container.find('#totalRows');
@@ -107,12 +114,17 @@ $.fn.extend({
         function renderpaging(container, options, pageindex, pagesize, totalrow) {
              
             var numbtnWidth = 40;
-          
-            var pagecount = parseInt(totalrows / pagesize);
-            var ooPgc = totalrows % pagesize;
-            if (ooPgc > 0) {
-                pagecount++;
+
+            var pagecount = 0;
+
+            if (totalrow > 0) {
+                pagecount = parseInt(totalrows / pagesize);
+                var ooPgc = totalrows % pagesize;
+                if (ooPgc > 0) {
+                    pagecount++;
+                }
             }
+           
             //add hidden params container
             var html = [];
 
@@ -132,88 +144,107 @@ $.fn.extend({
             // :生成各个分页按钮.
             var pageDivhtml = "<div class='p-pg' id='ppg'><ul class='pagination'>";
 
-            //add first and pre button
-            pageDivhtml += "<li><a href='javascript:void(0);' class='p-first hover' id='pfirst'>" + options.firsttext + "</a></li>";
-            pageDivhtml += "<li><a href='javascript:void(0);' class='p-pre hover' id='ppre'>" + options.pretext + "</a></li>";
+            if (totalrow > 0) {
+                //add first and pre button
+                pageDivhtml += "<li><a href='javascript:void(0);' class='p-first hover' id='pfirst'>" +
+                    options.firsttext +
+                    "</a></li>";
+                pageDivhtml += "<li><a href='javascript:void(0);' class='p-pre hover' id='ppre'>" +
+                    options.pretext +
+                    "</a></li>";
 
-            //process number buttons.
-            var current = pageindex;
+                //process number buttons.
+                var current = pageindex;
 
-            //确定当前页之前,之后的页码,保证一共出现11个页码按钮
-            if (options.shownumbers) {
+                //确定当前页之前,之后的页码,保证一共出现11个页码按钮
+                if (options.shownumbers) {
 
-                if (pagecount > 10) {
-                    var startpg = 1;
+                    if (pagecount > 10) {
+                        var startpg = 1;
 
-                    if (current >= 6) {
-                        startpg = current - 5;
-                    }
+                        if (current >= 6) {
+                            startpg = current - 5;
+                        }
 
-                    if (current + 5 > pagecount) {
-                        startpg = pagecount - 10;
-                    }
+                        if (current + 5 > pagecount) {
+                            startpg = pagecount - 10;
+                        }
 
-                    var maxI = startpg + 11;
+                        var maxI = startpg + 11;
 
-                    for (var i = startpg; i < maxI; i++) {
-                        //  slog(i);
-                        if (i === current) {
-                            pageDivhtml += "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" +
-                                numbtnWidth +
-                                "px;' id='p" +
-                                i +
-                                "'>" +
-                                i +
-                                "</a></li>";
-                        } else {
-                            pageDivhtml += "<li><a href='javascript:void(0);' class='p-numbers hover'  style='width:" +
-                                numbtnWidth +
-                                "px;'  id='p" +
-                                i +
-                                "'>" +
-                                i +
-                                "</a></li>";
+                        for (var i = startpg; i < maxI; i++) {
+                            //  slog(i);
+                            if (i === current) {
+                                pageDivhtml +=
+                                    "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" +
+                                    numbtnWidth +
+                                    "px;' id='p" +
+                                    i +
+                                    "'>" +
+                                    i +
+                                    "</a></li>";
+                            } else {
+                                pageDivhtml +=
+                                    "<li><a href='javascript:void(0);' class='p-numbers hover'  style='width:" +
+                                    numbtnWidth +
+                                    "px;'  id='p" +
+                                    i +
+                                    "'>" +
+                                    i +
+                                    "</a></li>";
+                            }
+                        }
+
+                    } else {
+                        for (var j = 1; j <= pagecount; j++) {
+                            var pg1 = j;
+                            if (j === current) {
+                                pageDivhtml +=
+                                    "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" +
+                                    numbtnWidth +
+                                    "px;'  id='p" +
+                                    current +
+                                    "'>" +
+                                    current +
+                                    "</a></li>";
+                            } else {
+                                pageDivhtml +=
+                                    "<li><a href='javascript:void(0);' class='p-numbers hover'  style='width:" +
+                                    numbtnWidth +
+                                    "px;' id='p" +
+                                    pg1 +
+                                    "'>" +
+                                    pg1 +
+                                    "</a></li>";
+                            }
                         }
                     }
-
                 } else {
-                    for (var j = 1; j <= pagecount; j++) {
-                        var pg1 = j;
-                        if (j === current) {
-                            pageDivhtml += "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" +
-                                numbtnWidth +
-                                "px;'  id='p" +
-                                current +
-                                "'>" +
-                                current +
-                                "</a></li>";
-                        } else {
-                            pageDivhtml += "<li><a href='javascript:void(0);' class='p-numbers hover'  style='width:" +
-                                numbtnWidth +
-                                "px;' id='p" +
-                                pg1 +
-                                "'>" +
-                                pg1 +
-                                "</a></li>";
-                        }
-                    }
+                    pageDivhtml += "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" +
+                        numbtnWidth +
+                        "px;' id='p" +
+                        current +
+                        "'>" +
+                        current +
+                        "</a></li>";
+                }
+                //add last and next button
+                pageDivhtml += "<li><a href='javascript:void(0);' class='p-next hover' id='pnext'>" +
+                    options.nexttext +
+                    "</a></li>";
+                pageDivhtml += "<li><a href='javascript:void(0);' class='p-last hover' id='plast'>" +
+                    options.lasttext +
+                    "</a></li>";
+
+                //add info 
+                if (options.showInfo) {
+                    var infostr = "共 " + totalrows + " 条" + " / " + pagecount + " 页(每页" + pagesize + "条)";
+                    var infohtml = "<li><span style='margin-left:10px;'>" + infostr + "</span></li>";
+                    pageDivhtml += infohtml;
                 }
             } else {
-                pageDivhtml += "<li><a href='javascript:void(0);' class='p-number hover'  style='width:" +
-                               numbtnWidth +
-                               "px;' id='p" +
-                               current +
-                               "'>" +
-                               current +
-                               "</a></li>";
-            }
-            //add last and next button
-            pageDivhtml += "<li><a href='javascript:void(0);' class='p-next hover' id='pnext'>" + options.nexttext + "</a></li>";
-            pageDivhtml += "<li><a href='javascript:void(0);' class='p-last hover' id='plast'>" + options.lasttext + "</a></li>";
-
-            //add info 
-            if (options.showInfo) {
-                var infostr = "共 " + totalrows + " 条" + " / " + pagecount + " 页";
+                //无数据
+                var infostr = "共 " + totalrows + " 条" + " / " + pagecount + " 页"; //var infostr = "无数据";
                 var infohtml = "<li><span style='margin-left:10px;'>" + infostr + "</span></li>";
                 pageDivhtml += infohtml;
             }
